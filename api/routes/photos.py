@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from middlewares.auth_middleware import token_required, with_current_user
+from services.like_service import toggle_like
 from services.photo_service import create_photo, delete_photo, get_random_photo, list_all_photos, list_photos_by_user
 
 photo_bp = Blueprint('photo', __name__)
@@ -7,8 +8,9 @@ photo_bp = Blueprint('photo', __name__)
 ## LIST ALL PHOTOS
 @photo_bp.route('/all-photos', methods=['GET'])
 @token_required
-def get_all_photos():
-    photos = list_all_photos()
+@with_current_user
+def get_all_photos(current_user):
+    photos = list_all_photos(current_user["user_id"])
     return jsonify(photos), 200
 
 ## LIST ONE RANDOM PHOTO
@@ -51,6 +53,19 @@ def delete_photo_route(current_user, photo_id):
 ## LIST PHOTOS BY USER
 @photo_bp.route('/user-photos/<int:user_id>', methods=['GET'])
 @token_required
-def get_user_photos_route(user_id):
-    photos = list_photos_by_user(user_id)
+@with_current_user
+def get_user_photos_route(current_user, user_id):
+    photos = list_photos_by_user(user_id, current_user["user_id"])  # Passa o current_user_id também
     return jsonify(photos), 200
+
+## LIKE A PHOTO
+@photo_bp.route("/<int:photo_id>/like", methods=["POST"])
+@token_required
+@with_current_user
+def like_or_unlike_photo(current_user, photo_id):
+    try:
+        result = toggle_like(photo_id, current_user["user_id"])
+        return jsonify(result), 200
+    except Exception as e:
+        print("Erro na rota de like:", str(e))
+        return jsonify({"error": str(e)}), 500

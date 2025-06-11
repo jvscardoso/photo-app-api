@@ -36,3 +36,14 @@ CREATE TABLE IF NOT EXISTS photos (
     deleted_at TIMESTAMP
 );
 
+DROP TABLE IF EXISTS photo_likes CASCADE;
+
+CREATE TABLE IF NOT EXISTS photo_likes (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    photo_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, photo_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (photo_id) REFERENCES photos(id)
+);

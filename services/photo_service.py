@@ -6,21 +6,37 @@ from datetime import datetime
 ## Get a random photo to show to an unanthenticated user
 def get_random_photo():
     with use_database() as cursor:
-        cursor.execute("SELECT * FROM photos WHERE deleted_at IS NULL")
+        cursor.execute("""
+            SELECT 
+                p.*, 
+                COUNT(pl.id) AS likes
+            FROM photos p
+            LEFT JOIN photo_likes pl ON pl.photo_id = p.id
+            WHERE p.deleted_at IS NULL
+            GROUP BY p.id
+        """)
         rows = cursor.fetchall()
         if not rows:
             return None
         return serialize_photo(random.choice(rows))
 
 ## Lists all photos to an authenticated user
-def list_all_photos(limit=10):
+def list_all_photos(current_user_id, limit=10):
     with use_database() as cursor:
         cursor.execute("""
-            SELECT * FROM photos
+            SELECT 
+                p.*, 
+                COUNT(pl.id) AS likes,
+                COALESCE((MAX((pl.user_id = %s)::int) = 1), false) AS liked_by_user
+            FROM photos p
+            LEFT JOIN photo_likes pl ON pl.photo_id = p.id
+            WHERE p.deleted_at IS NULL
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
             LIMIT %s
-        """, (limit,))
+        """, (current_user_id, limit))
         rows = cursor.fetchall()
-        
+
     return [serialize_photo(row) for row in rows]
 
 ## Create a new photo
@@ -46,7 +62,7 @@ def create_photo(photo_data, current_user):
         cursor.execute("SELECT * FROM photos WHERE id = %s", (photo_id,))
         row = cursor.fetchone()
 
-    return serialize_photo(row) if row else None
+    return serialize_photo({**row, "likes": 0}) if row else None
 
 ## Delete a photo  
 def delete_photo(photo_id, current_user_id):
@@ -70,14 +86,21 @@ def delete_photo(photo_id, current_user_id):
     return True
 
 ## Filtered list
-def list_photos_by_user(user_id, limit=10):
+def list_photos_by_user(photographer_id, current_user_id, limit=10):
     with use_database() as cursor:
         cursor.execute("""
-            SELECT * FROM photos 
-            WHERE photographer_id = %s AND deleted_at IS NULL
-            ORDER BY created_at DESC
+            SELECT 
+                p.*, 
+                COUNT(pl.id) AS likes,
+                CASE WHEN upl.id IS NOT NULL THEN TRUE ELSE FALSE END AS liked_by_user
+            FROM photos p
+            LEFT JOIN photo_likes pl ON pl.photo_id = p.id
+            LEFT JOIN photo_likes upl ON upl.photo_id = p.id AND upl.user_id = %s
+            WHERE p.photographer_id = %s AND p.deleted_at IS NULL
+            GROUP BY p.id, liked_by_user
+            ORDER BY p.created_at DESC
             LIMIT %s
-        """, (user_id, limit))
+        """, (current_user_id, photographer_id, limit))
         rows = cursor.fetchall()
 
     return [serialize_photo(row) for row in rows]

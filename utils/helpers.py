@@ -22,7 +22,9 @@ def serialize_photo(row):
         "photographer_url": row["photographer_url"],
         "photographer_id": row["photographer_id"],
         "avg_color": row["avg_color"],
-        "alt": row["alt"]
+        "alt": row["alt"],
+        "likes": row.get("likes", 0),
+        "liked_by_user": row.get("liked_by_user", False)
     }
 
 def email_exists(email):
