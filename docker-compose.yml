@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:15
+    container_name: photo-database
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: photos_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    container_name: photo-api
+    build: .
+    command: flask --debug run --host=0.0.0.0 --port=5000
+    ports:
+      - "8000:5000"
+    depends_on:
+      - db
+    environment:
+      FLASK_APP: main.py
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/photos_app
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: photos_app
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata:

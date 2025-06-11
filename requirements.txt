@@ -1,0 +1,8 @@
+Flask
+psycopg2-binary
+python-dotenv
+flask-jwt-extended
+dotenv
+bcrypt
+Flask-SQLAlchemy
+PyJWT==2.8.0
