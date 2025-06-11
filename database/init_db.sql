@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS photos (
     src_portrait TEXT,
     src_landscape TEXT,
     src_tiny TEXT,
-    alt TEXT
+    alt TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 

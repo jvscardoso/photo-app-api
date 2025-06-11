@@ -9,7 +9,7 @@ def login_user(email, password):
         user = cursor.fetchone()
 
     if user and bcrypt.checkpw(password.encode("utf-8"), user["password_hash"].encode("utf-8")):
-        token = generate_token(user["id"], user["role"])
+        token = generate_token(user["id"], user["role"], user["name"])
         return token, user["name"], user["role"]
 
     return None

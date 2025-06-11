@@ -12,6 +12,19 @@ def serialize_user(row):
         "deleted_at": row["deleted_at"].isoformat() if row["deleted_at"] else None
     }
 
+def serialize_photo(row):
+    return {
+        "id": row["id"],
+        "width": row["width"],
+        "height": row["height"],
+        "url": row["url"],
+        "photographer": row["photographer"],
+        "photographer_url": row["photographer_url"],
+        "photographer_id": row["photographer_id"],
+        "avg_color": row["avg_color"],
+        "alt": row["alt"]
+    }
+
 def email_exists(email):
     with use_database() as cursor:
         cursor.execute("SELECT 1 FROM users WHERE email = %s", (email,))

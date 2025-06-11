@@ -38,8 +38,8 @@ def load_photos():
                         avg_color,
                         src_original, src_large2x, src_large, src_medium,
                         src_small, src_portrait, src_landscape, src_tiny,
-                        alt
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        alt, created_at, updated_at, deleted_at
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, DEFAULT, NULL, NULL)
                     """,
                     (
                         row["id"], row["width"], row["height"], row["url"],
