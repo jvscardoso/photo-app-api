@@ -34,7 +34,7 @@ This is a RESTful API developed using **Python (Flask)** that allows users to **
 
 ```bash
 git clone https://github.com/jvscardoso/photo-app-api.git
-cd netDiag-api
+cd photo-app-api.git
 ```
 
 ### 2. Create a virual environment
