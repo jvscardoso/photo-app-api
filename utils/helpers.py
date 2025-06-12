@@ -24,7 +24,10 @@ def serialize_photo(row):
         "avg_color": row["avg_color"],
         "alt": row["alt"],
         "likes": row.get("likes", 0),
-        "liked_by_user": row.get("liked_by_user", False)
+        "liked_by_user": row.get("liked_by_user", False),
+        "src_original": row["src_original"],
+        "src_medium": row["src_medium"],
+        "created_at": row["created_at"].isoformat(),
     }
 
 def email_exists(email):

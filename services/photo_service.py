@@ -47,13 +47,20 @@ def create_photo(photo_data, current_user):
         cursor.execute(
             """
             INSERT INTO photos (
-                id, url, alt, photographer, photographer_id, created_at
-            ) VALUES (%s, %s, %s, %s, %s, NOW())
+                id, url, src_original, src_medium, alt,
+                width, height, avg_color,
+                photographer, photographer_id, created_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """,
             (
                 photo_id,
                 photo_data.get("url"),
+                photo_data.get("url"),
+                photo_data.get("url"),
                 photo_data.get("alt"),
+                photo_data.get("width"),
+                photo_data.get("height"),
+                photo_data.get("avg_color"),
                 current_user["name"],
                 current_user["user_id"]
             )

@@ -27,8 +27,10 @@ def get_daily_photo():
 @with_current_user
 def create_photo_route(current_user):
     data = request.json
-    if not data.get("url") or not data.get("alt"):
-        return jsonify({"error": "URL and ALT text are required"}), 400
+    required_fields = ["url", "alt", "width", "height", "avg_color"]
+
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "URL, ALT, width, height, and avg_color are required"}), 400
 
     try:
         created_photo = create_photo(data, current_user)
@@ -55,7 +57,7 @@ def delete_photo_route(current_user, photo_id):
 @token_required
 @with_current_user
 def get_user_photos_route(current_user, user_id):
-    photos = list_photos_by_user(user_id, current_user["user_id"])  # Passa o current_user_id também
+    photos = list_photos_by_user(user_id, current_user["user_id"]) 
     return jsonify(photos), 200
 
 ## LIKE A PHOTO
