@@ -1,5 +1,6 @@
 import bcrypt
 from database.db_connection import use_database
+from utils.helpers import email_exists, generate_user_id
 from utils.jwt import generate_token
 
 # LOGIN
@@ -16,18 +17,27 @@ def login_user(email, password):
 
 # REGISTER 
 def register_user(name, email, password):
-    hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    if not all([name, email, password]):
+        return False, "Name, email, and password are required"
+
+    if email_exists(email):
+        return False, "Email already registered"
+
+    user_id = generate_user_id()
 
     with use_database() as cursor:
-        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
-        if cursor.fetchone():
-            return False, "Email already registered"
+        cursor.execute("SELECT 1 FROM users WHERE id = %s", (user_id,))
+        while cursor.fetchone():
+            user_id = generate_user_id()
+
+        hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
         cursor.execute(
             """
-            INSERT INTO users (name, email, password_hash, role)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO users (id, name, email, password_hash, role)
+            VALUES (%s, %s, %s, %s, %s)
             """,
-            (name, email, hashed_pw, "user")
+            (user_id, name, email, hashed_pw, "user")
         )
+
     return True, "User registered successfully"

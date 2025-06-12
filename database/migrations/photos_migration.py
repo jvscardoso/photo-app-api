@@ -45,9 +45,9 @@ def load_photos():
                         row["id"], row["width"], row["height"], row["url"],
                         row["photographer"], row["photographer_url"], row["photographer_id"],
                         row.get("avg_color"),
-                        row.get("src_original"), row.get("src_large2x"), row.get("src_large"),
-                        row.get("src_medium"), row.get("src_small"), row.get("src_portrait"),
-                        row.get("src_landscape"), row.get("src_tiny"),
+                        row.get("src.original"), row.get("srclarge2x"), row.get("src.large"),
+                        row.get("src.medium"), row.get("src.small"), row.get("src.portrait"),
+                        row.get("src.landscape"), row.get("src.tiny"),
                         row.get("alt")
                     )
                 )
